@@ -1,0 +1,51 @@
+﻿@page "/films/{Id}"
+@using StarWarsSPA.UI.Components
+@using StarWarsSPA.Presentation.ViewModels
+@inject FilmDetailsViewModel ViewModel
+
+<PageTitle>Film Details</PageTitle>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white px-6 py-8">
+    <BreadCrumbs /> <!-- Breadcrumbs component to show navigation path -->
+    <!-- Check if the film details are still loading -->
+    @if (ViewModel.Loading)
+    {
+        <p class="text-center text-gray-400 mt-20">Loading film details...</p> <!-- Show loading message -->
+    }
+    else
+    {
+        <div class="max-w-5xl mx-auto bg-black bg-opacity-70 border border-yellow-400 rounded-2xl p-6 shadow-lg">
+            <h1 class="text-3xl font-bold text-yellow-400 mb-2">@ViewModel.Film?.Title</h1> <!-- Display film title -->
+            <p class="text-sm text-gray-300 mb-4">Episode @ViewModel.Film?.EpisodeId | Directed by <span class="text-yellow-300">@ViewModel.Film?.Director</span></p> <!-- Display episode number and director -->
+
+            <div class="text-yellow-300 text-sm bg-yellow-900 bg-opacity-10 p-4 rounded-md mb-6 font-mono tracking-wide max-h-60 overflow-auto shadow-inner">
+                @ViewModel.Film?.OpeningCrawl <!-- Display the opening crawl text -->
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300">
+                @* Characters *@
+                <DetailList Title="Persons" Items="ViewModel.Characters" UrlBase="/people" GetItemName="p => p.Name"
+                            GetItemUrl="p => (p.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()) ?? string.Empty" />
+                @* Starships *@
+                <DetailList Title="Starships" Items="ViewModel.Starships" UrlBase="/starships" GetItemName="starShip => starShip.Name"
+                            GetItemUrl="starship => (starship.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()) ?? string.Empty" />
+                @* Planets *@
+                <DetailList Title="Planets" Items="ViewModel.Planets" UrlBase="/planets" GetItemName="planet => planet.Name"
+                            GetItemUrl="planet => (planet.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()) ?? string.Empty" />
+                @* Species *@
+                <DetailList Title="Species" Items="ViewModel.Species" UrlBase="/species" GetItemName="specie => specie.Name"
+                            GetItemUrl="specie => (specie.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()) ?? string.Empty" />
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Id { get; set; }<!-- Film ID passed as URL parameter -->
+
+    protected override async Task OnInitializedAsync()
+    {
+        var filmId = Id ?? ""; <!-- Assign the film ID, fallback to empty string if null -->
+        await ViewModel.LoadAsync(filmId); <!-- Call the ViewModel's LoadAsync method to load film details using the ID -->
+    }
+}

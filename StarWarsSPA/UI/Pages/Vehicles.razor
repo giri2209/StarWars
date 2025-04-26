@@ -1,0 +1,50 @@
+﻿@page "/vehicles"
+@using StarWarsSPA.UI.Components
+@using StarWarsSPA.Presentation.ViewModels
+@inject VehicleViewModel ViewModel
+<!-- Page Header for Vehicles -->
+<h1 class="text-4xl font-bold text-yellow-400 text-center mb-6">Vehicles</h1>
+
+<!-- Search Bar component for searching vehicles -->
+<SearchBar OnSearch="ViewModel.HandleSearch" Placeholder="Search vehicles..." />
+
+<!-- Conditional rendering for the loading state -->
+@if (ViewModel.Loading)
+{
+    <p class="text-center mt-10 text-gray-400">Loading vehicles...</p>
+}
+else
+{
+    <!-- Grid layout to display each vehicle -->
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+        @foreach (var vehicle in ViewModel.PaginatedVehicles)
+        {
+            <!-- Vehicle Card -->
+            <a href="@($"/vehicles/{ViewModel.GetIdFromUrl(vehicle.Url ?? "")}")" class="bg-black bg-opacity-60 border border-yellow-400 rounded-xl p-4 hover:shadow-yellow-500/40 transition-shadow">
+                <h2 class="text-xl font-bold text-yellow-300 mb-2">@vehicle.Name</h2>
+                <p class="text-sm text-gray-300"><span class="text-yellow-400">Model:</span> @vehicle.Model</p>
+                <p class="text-sm text-gray-300"><span class="text-yellow-400">Manufacturer:</span> @vehicle.Manufacturer</p>
+            </a>
+        }
+    </div>
+
+    <!-- Pagination controls -->
+    @if (ViewModel.TotalPages > 1)
+    {
+        <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
+            <!-- Prev Button -->
+            <button @onclick="ViewModel.PreviousPage" disabled="@ViewModel.IsFirstPage" class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">Prev</button>
+            <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
+            <!-- Next Button -->
+            <button @onclick="ViewModel.NextPage" disabled="@ViewModel.IsLastPage" class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">Next</button>
+        </div>
+    }
+}
+
+@code {
+    // Initialize ViewModel when the page loads
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.Initialize();
+    }
+}

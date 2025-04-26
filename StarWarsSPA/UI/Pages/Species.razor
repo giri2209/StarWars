@@ -1,0 +1,82 @@
+﻿@page "/species"
+@using StarWarsSPA.UI.Components
+@using StarWarsSPA.Core.Interfaces
+@using StarWarsSPA.Presentation.ViewModels
+@inject ISwapiService SwapiService
+<!-- Page title for browser -->
+<PageTitle>Species</PageTitle>
+
+<!-- Page content -->
+<div class="min-h-screen bg-gradient-to-br from-gray-950 to-black text-white p-6">
+    <BreadCrumbs />
+    <h1 class="text-4xl font-bold text-yellow-400 text-center mb-6">Species</h1>
+
+    <!-- Search input bound to ViewModel -->
+    <SearchBar Placeholder="Search species..." OnSearch="HandleSearch" />
+
+    <!-- Loading indicator -->
+    @if (ViewModel?.Loading == true)
+    {
+        <p class="text-center mt-10 text-gray-400">Loading species...</p>
+    }
+    else
+    {
+        <!-- Grid of species cards -->
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+            @if (ViewModel?.PaginatedSpecies != null)
+            {
+                foreach (var specie in ViewModel.PaginatedSpecies)
+                {
+                    var id = specie?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last();
+
+                    <!-- Species card linking to details page -->
+                    <a href="/species/@id"
+                       class="bg-black bg-opacity-60 border border-yellow-400 rounded-xl p-4 hover:shadow-yellow-500/40 transition-shadow">
+                        <h2 class="text-xl font-bold text-yellow-300 mb-2">@specie?.Name</h2>
+                        <p class="text-sm text-gray-300">
+                            <span class="text-yellow-400">Classification:</span> @specie?.Classification
+                        </p>
+                        <p class="text-sm text-gray-300">
+                            <span class="text-yellow-400">Designation:</span> @specie?.Designation
+                        </p>
+                    </a>
+                }
+            }
+        </div>
+
+        <!-- Pagination controls -->
+        @if (ViewModel?.TotalPages > 1)
+        {
+            <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
+                <button @onclick="() => ViewModel.CurrentPage--"
+                        disabled="@(ViewModel.CurrentPage == 1)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
+                    Prev
+                </button>
+                <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
+                <button @onclick="() => ViewModel.CurrentPage++"
+                        disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
+                    Next
+                </button>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private SpeciesViewModel? ViewModel;
+
+    // Initializes ViewModel and loads species data
+    protected override async Task OnInitializedAsync()
+    {
+        ViewModel = new SpeciesViewModel(SwapiService);
+        await ViewModel.Initialize();
+    }
+
+    // Handles search input from the SearchBar component
+    private void HandleSearch(string query)
+    {
+        ViewModel?.HandleSearch(query);
+    }
+}

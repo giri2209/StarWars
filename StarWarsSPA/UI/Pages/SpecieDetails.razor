@@ -1,0 +1,65 @@
+﻿@page "/species/{Id}"
+@using StarWarsSPA.UI.Components
+@using StarWarsSPA.Core.Interfaces
+@using StarWarsSPA.Presentation.ViewModels
+@inject ISwapiService SwapiService
+<!-- Loading state -->
+@if (ViewModel?.Loading == true)
+{
+    <p class="text-center text-gray-400 mt-20">Loading species...</p>
+}
+else if (ViewModel?.Species != null)
+{
+    <div class="min-h-screen bg-gradient-to-br from-gray-950 to-black text-white px-6 py-8">
+        <BreadCrumbs />
+        <div class="max-w-4xl mx-auto bg-black bg-opacity-70 border border-yellow-400 rounded-2xl p-6 shadow-xl">
+
+            <h1 class="text-3xl font-bold text-yellow-400 mb-3">@ViewModel?.Species?.Name</h1>
+            <!-- Short species summary -->
+            <p class="text-sm text-gray-300 mb-4"><span class="text-yellow-400">Height:</span>@ViewModel?.Species?.AverageHeight cm</p>
+
+            <!-- Species attributes in two-column grid -->
+            <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300 mb-6">
+                <div>
+                    <p><span class="text-yellow-400">Classification:</span> @ViewModel?.Species?.Classification</p>
+                    <p><span class="text-yellow-400">Designation:</span> @ViewModel?.Species?.Designation</p>
+                    <p><span class="text-yellow-400">Average Lifespan:</span> @ViewModel?.Species?.AverageLifespan years</p>
+                    <p><span class="text-yellow-400">Skin Colors:</span> @ViewModel?.Species?.SkinColors</p>
+                </div>
+                <div>
+                    <p><span class="text-yellow-400">Eye Colors:</span> @ViewModel?.Species?.EyeColors</p>
+                    <p><span class="text-yellow-400">Hair Colors:</span> @ViewModel?.Species?.HairColors</p>
+                    <p><span class="text-yellow-400">Language:</span> @ViewModel?.Species?.Language</p>
+                </div>
+            </div>
+
+            <!-- Associated films -->
+            <DetailList Title="Films"
+                        Items="ViewModel?.Films"
+                        UrlBase="/films"
+                        GetItemName="film => film?.Title ?? string.Empty"
+                        GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+            <!-- Associated characters -->
+            <DetailList Title="Characters"
+                        Items="ViewModel?.People"
+                        UrlBase="/people"
+                        GetItemName="person => person?.Name ?? string.Empty"
+                        GetItemUrl="person => person?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+        </div>
+        </div>
+        }
+
+        @code {
+            [Parameter] public string? Id { get; set; }
+
+    private SpecieDetailsViewModel? ViewModel;
+
+        // Initializes the ViewModel and loads species data by ID
+        protected override async Task OnInitializedAsync()
+        {
+            ViewModel = new SpecieDetailsViewModel(SwapiService);
+            var specieId = Id ?? "";
+            await ViewModel.Initialize(specieId);
+        }
+        }

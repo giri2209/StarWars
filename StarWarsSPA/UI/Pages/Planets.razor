@@ -1,0 +1,74 @@
+﻿@page "/planets"
+@using StarWarsSPA.UI.Components
+@using StarWarsSPA.Core.Models
+@using StarWarsSPA.Presentation.ViewModels
+@inject PlanetViewModel ViewModel
+
+<PageTitle>Planets</PageTitle>
+
+<!-- Main layout with gradient background -->
+<div class="min-h-screen bg-gradient-to-br from-gray-950 to-black text-white p-6">
+
+    <!-- Breadcrumb navigation -->
+    <BreadCrumbs />
+
+    <!-- Page title -->
+    <h1 class="text-4xl font-bold text-yellow-400 text-center mb-6">Planets</h1>
+
+    <!-- Search input -->
+    <SearchBar OnSearch="ViewModel.HandleSearch" Placeholder="Search planets..." />
+
+    @if (ViewModel?.Loading == true)
+    {
+        <!-- Loading state -->
+        <p class="text-center mt-10 text-gray-400">Loading planets...</p>
+    }
+    else
+    {
+        <!-- Planet grid -->
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+            @if (ViewModel?.PaginatedPlanets != null)
+            {
+                foreach (var planet in ViewModel.PaginatedPlanets)
+                {
+                    var id = planet?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last();
+
+                    <!-- Planet card -->
+                    <a href="/planets/@id" class="bg-black bg-opacity-60 border border-yellow-400 rounded-xl p-4 hover:shadow-yellow-500/40 transition-shadow">
+                        <h2 class="text-xl font-bold text-yellow-300 mb-2">@planet?.Name</h2>
+                        <p class="text-sm text-gray-300"><span class="text-yellow-400">Climate:</span> @planet?.Climate</p>
+                        <p class="text-sm text-gray-300"><span class="text-yellow-400">Terrain:</span> @planet?.Terrain</p>
+                    </a>
+                }
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (ViewModel?.TotalPages > 1)
+        {
+            <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
+                <button @onclick="() => ViewModel.ChangePage(ViewModel.CurrentPage - 1)"
+                        disabled="@(ViewModel.CurrentPage == 1)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
+                    Prev
+                </button>
+
+                <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
+
+                <button @onclick="() => ViewModel.ChangePage(ViewModel.CurrentPage + 1)"
+                        disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
+                    Next
+                </button>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    // Fetches initial list of planets
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadPlanetsAsync();
+    }
+}

@@ -1,0 +1,66 @@
+﻿@page "/planets/{Id}"
+@using StarWarsSPA.UI.Components
+@using StarWarsSPA.Presentation.ViewModels
+@inject PlanetDetailsViewModel ViewModel
+
+<PageTitle>@ViewModel.Planet?.Name</PageTitle>
+
+<!-- Page background and layout -->
+<div class="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white px-6 py-8">
+
+    @if (ViewModel.Loading)
+    {
+        <!-- Loading message -->
+        <p class="text-center text-gray-400 mt-20">Loading planet...</p>
+    }
+    else if (ViewModel.Planet != null)
+    {
+        <div class="min-h-screen bg-gradient-to-br from-gray-950 to-black text-white px-6 py-8">
+            <BreadCrumbs />
+            <!-- Planet details card -->
+            <div class="max-w-4xl mx-auto bg-black bg-opacity-70 border border-yellow-400 rounded-2xl p-6 shadow-xl">
+
+                <!-- Planet name -->
+                <h1 class="text-3xl font-bold text-yellow-400 mb-3">@ViewModel.Planet.Name</h1>
+                <p class="text-sm text-gray-300 mb-4">@ViewModel.Planet.Diameter km</p>
+
+                <!-- Planet stats -->
+                <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300 mb-6">
+                    <div>
+                        <p><span class="text-yellow-400">Climate:</span> @ViewModel.Planet.Climate</p>
+                        <p><span class="text-yellow-400">Terrain:</span> @ViewModel.Planet.Terrain</p>
+                        <p><span class="text-yellow-400">Population:</span> @ViewModel.Planet.Population</p>
+                    </div>
+                    <div>
+                        <p><span class="text-yellow-400">Rotation Period:</span> @ViewModel.Planet.RotationPeriod hours</p>
+                        <p><span class="text-yellow-400">Orbital Period:</span> @ViewModel.Planet.OrbitalPeriod days</p>
+                    </div>
+                </div>
+
+                <!-- Related films -->
+                <DetailList Title="Films"
+                            Items="ViewModel.Films"
+                            UrlBase="/films"
+                            GetItemName="film => film.Title"
+                            GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+                <!-- Related residents -->
+                <DetailList Title="Residents"
+                            Items="ViewModel.Residents"
+                            UrlBase="/people"
+                            GetItemName="resident => resident.Name"
+                            GetItemUrl="resident => resident?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+            </div>
+            </div>
+            }
+        </div>
+
+        @code {
+            [Parameter] public string? Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+        {
+            var planetId = Id ?? "";
+            await ViewModel.LoadAsync(planetId);
+        }
+        }

@@ -1,0 +1,37 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Routing
+
+<!-- Fullscreen hero layout with background image and navigation -->
+<div class="bg-black text-white">
+    <div class="relative min-h-screen flex flex-col items-center justify-center text-white px-4 overflow-hidden">
+
+        <!-- Background image with transparency -->
+        <div class="absolute inset-0 bg-cover bg-center opacity-20"
+             style="background-image: url('https://platform.vox.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/15618476/tfa_poster_wide_header-1536x864-324397389357.0.0.1537961254.jpg?quality=90&strip=all&crop=7.8125,0,84.375,100')">
+        </div>
+
+        <!-- Black overlay for better contrast -->
+        <div class="absolute inset-0"></div>
+
+        <!-- Foreground content -->
+        <div class="relative z-10 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 text-yellow-400 drop-shadow-lg">
+                Star Wars Explorer
+            </h1>
+
+            <p class="text-lg md:text-xl mb-10 max-w-xl mx-auto text-white">
+                Dive into the Star Wars universe. Explore characters, starships, planets, films and more — all connected through the Force.
+            </p>
+
+            <!-- Navigation buttons to key sections -->
+            <div class="flex flex-wrap gap-4 justify-center">
+                <NavLink href="/people" class="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow hover:bg-yellow-400 hover:shadow-yellow-400/60 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 hover:shadow-lg">People</NavLink>
+                <NavLink href="/films" class="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow hover:bg-yellow-400 hover:shadow-yellow-400/60 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 hover:shadow-lg">Films</NavLink>
+                <NavLink href="/starships" class="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow hover:bg-yellow-400 hover:shadow-yellow-400/60 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 hover:shadow-lg">Starships</NavLink>
+                <NavLink href="/vehicles" class="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow hover:bg-yellow-400 hover:shadow-yellow-400/60 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 hover:shadow-lg">Vehicles</NavLink>
+                <NavLink href="/species" class="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow hover:bg-yellow-400 hover:shadow-yellow-400/60 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 hover:shadow-lg">Species</NavLink>
+                <NavLink href="/planets" class="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow hover:bg-yellow-400 hover:shadow-yellow-400/60 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 hover:shadow-lg">Planets</NavLink>
+            </div>
+        </div>
+    </div>
+</div>

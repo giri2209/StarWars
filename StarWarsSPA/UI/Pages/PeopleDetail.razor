@@ -1,0 +1,70 @@
+﻿@page "/people/{Id}"
+@using StarWarsSPA.UI.Components
+@using StarWarsSPA.Presentation.ViewModels
+@inject PeopleDetailViewModel ViewModel
+
+<PageTitle>Character Details</PageTitle>
+
+<!-- Main content area with gradient background -->
+<div class="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white p-6">
+
+    <BreadCrumbs />
+
+    @if (ViewModel.Loading)
+    {
+        <!-- Loading indicator -->
+        <p class="text-center text-gray-400 mt-20">Loading character details...</p>
+    }
+    else if (ViewModel.Person != null)
+    {
+        <!-- Character detail card -->
+        <div class="max-w-4xl mx-auto bg-black bg-opacity-70 border border-yellow-400 rounded-2xl p-6 shadow-lg">
+
+            <!-- Character name -->
+            <h1 class="text-3xl font-bold text-yellow-400 mb-4">@ViewModel.Person.Name</h1>
+
+            <!-- Basic information in a responsive grid -->
+            <div class="grid sm:grid-cols-2 gap-4 text-gray-300">
+                <p><span class="text-yellow-300 font-semibold">Height:</span> @(ViewModel.Person.Height?.ToString() ?? "n/a") cm</p>
+                <p><span class="text-yellow-300 font-semibold">Mass:</span> @(ViewModel.Person.Mass?.ToString() ?? "n/a") kg</p>
+                <p><span class="text-yellow-300 font-semibold">Hair Color:</span> @(ViewModel.Person.HairColor ?? "n/a")</p>
+                <p><span class="text-yellow-300 font-semibold">Skin Color:</span> @(ViewModel.Person.SkinColor ?? "n/a")</p>
+                <p><span class="text-yellow-300 font-semibold">Eye Color:</span> @(ViewModel.Person.EyeColor ?? "n/a")</p>
+                <p><span class="text-yellow-300 font-semibold">Birth Year:</span> @(ViewModel.Person.BirthYear ?? "n/a")</p>
+                <p><span class="text-yellow-300 font-semibold">Gender:</span> @(ViewModel.Person.Gender ?? "n/a")</p>
+            </div>
+
+            <!-- Related films -->
+            <DetailList Title="Films"
+                        Items="ViewModel.Films"
+                        UrlBase="/films"
+                        GetItemName="film => film?.Title ?? string.Empty"
+                        GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+            <!-- Related starships -->
+            <DetailList Title="Starships"
+                        Items="ViewModel.Starships"
+                        UrlBase="/starships"
+                        GetItemName="ship => ship?.Name ?? string.Empty"
+                        GetItemUrl="ship => ship?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+            <!-- Related species -->
+            <DetailList Title="Species"
+                        Items="ViewModel.Species"
+                        UrlBase="/species"
+                        GetItemName="sp => sp?.Name ?? string.Empty"
+                        GetItemUrl="sp => sp?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Id { get; set; }
+
+    // Fetch character details on initialization
+    protected override async Task OnInitializedAsync()
+    {
+        var peopleId = Id ?? "";
+        await ViewModel.Initialize(peopleId);
+    }
+}

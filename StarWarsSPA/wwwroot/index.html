@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>StarWarsSPA</title>
+    <base href="/" />
+    <link href="css/app.css" rel="stylesheet" />
+
+    <!-- If you add any scoped CSS files, uncomment the following to load them
+    <link href="StarWarsAPISPA.styles.css" rel="stylesheet" /> -->
+</head>
+<style>
+    body {
+        margin: 0;
+        background-color: black;
+    }
+
+    #loading {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .spinner {
+        border: 6px solid rgba(255,255,255,0.1);
+        border-left-color: yellow;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+<body>
+    <div id="app">
+        <div id="loading">
+            <div class="spinner"></div>
+            <p style="color:yellow; font-size:25px">Entering into world of StarWars...</p>
+        </div>
+    </div>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/threeInterop.js"></script>-->
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    
+</body>
+
+</html>
+
+
