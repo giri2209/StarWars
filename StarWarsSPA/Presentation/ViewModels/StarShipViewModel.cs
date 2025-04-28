@@ -8,25 +8,28 @@ namespace StarWarsSPA.Presentation.ViewModels
     /// </summary>
     public class StarShipViewModel
     {
+
+        private readonly ISwapiService _swapiService;
+
         /// <summary>
         /// The list of all available starships.
         /// </summary>
-        public List<Starship> All { get; private set; } = new();
+        public List<Starship> Starships { get; private set; } = new();
 
         /// <summary>
-        /// The list of filtered starships based on the search query.
+        /// The list of FilteredStarShips starships based on the search query.
         /// </summary>
-        public List<Starship> Filtered { get; private set; } = new();
+        public List<Starship> FilteredStarShips { get; private set; } = new();
 
         /// <summary>
         /// Indicates whether data is currently being loaded.
         /// </summary>
-        public bool IsLoading { get; private set; } = true;
+        public bool Loading { get; private set; } = true;
 
         /// <summary>
         /// The current page number for pagination.
         /// </summary>
-        public int CurrentPage { get; private set; } = 1;
+        public int CurrentPage { get; set; } = 1;
 
         /// <summary>
         /// The number of starships to display per page.
@@ -36,29 +39,38 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// The paginated starships for the current page.
         /// </summary>
-        public IEnumerable<Starship> Paginated =>
-            Filtered.Skip((CurrentPage - 1) * ItemsPerPage).Take(ItemsPerPage);
+        public IEnumerable<Starship> PaginatedStarships =>
+            FilteredStarShips.Skip((CurrentPage - 1) * ItemsPerPage).Take(ItemsPerPage);
 
         /// <summary>
-        /// The total number of pages available based on the filtered list.
+        /// The total number of pages available based on the FilteredStarShips list.
         /// </summary>
         public int TotalPages =>
-            (int)Math.Ceiling((double)Filtered.Count / ItemsPerPage);
+            (int)Math.Ceiling((double)FilteredStarShips.Count / ItemsPerPage);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StarShipViewModel"/> class.
+        /// </summary>
+        /// <param name="swapiService">The service used to fetch vehicle data.</param>
+        public StarShipViewModel(ISwapiService swapiService)
+        {
+            _swapiService = swapiService;
+        }
 
         /// <summary>
         /// Initializes the view model by fetching all starships from the service.
         /// </summary>
         /// <param name="swapiService">The service used to fetch starship data.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Initialize(ISwapiService swapiService)
+        public async Task InitializeAsync(ISwapiService swapiService)
         {
-            IsLoading = true;
+            Loading = true;
 
             try
             {
                 // Fetch all starships from the service
-                All = await swapiService.GetListAsync<Starship>("starships") ?? new List<Starship>();
-                Filtered = All;
+                Starships = await swapiService.GetListAsync<Starship>("starships") ?? new List<Starship>();
+                FilteredStarShips = Starships;
             }
             catch (Exception ex)
             {
@@ -67,7 +79,7 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             finally
             {
-                IsLoading = false;
+                Loading = false;
             }
         }
 
@@ -75,21 +87,12 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// Filters the starship list based on the search query.
         /// </summary>
         /// <param name="query">The search query used to filter the starships by name.</param>
-        public void Search(string query)
+        public void HandleSearch(string query)
         {
-            Filtered = All
+            FilteredStarShips = Starships
                 .Where(s => !string.IsNullOrEmpty(s.Name) && s.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
                 .ToList();
             CurrentPage = 1; // Reset to the first page after a new search
-        }
-
-        /// <summary>
-        /// Changes the current page by a specified delta (positive or negative).
-        /// </summary>
-        /// <param name="delta">The amount by which to change the current page. Can be positive or negative.</param>
-        public void ChangePage(int delta)
-        {
-            CurrentPage = Math.Clamp(CurrentPage + delta, 1, TotalPages);
         }
 
         /// <summary>

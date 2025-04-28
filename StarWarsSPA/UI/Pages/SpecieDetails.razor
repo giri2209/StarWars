@@ -2,7 +2,11 @@
 @using StarWarsSPA.UI.Components
 @using StarWarsSPA.Core.Interfaces
 @using StarWarsSPA.Presentation.ViewModels
-@inject ISwapiService SwapiService
+@inject SpecieDetailsViewModel ViewModel
+
+<!-- Page title for browser -->
+<PageTitle>Specie Details</PageTitle>
+
 <!-- Loading state -->
 @if (ViewModel?.Loading == true)
 {
@@ -43,7 +47,7 @@ else if (ViewModel?.Species != null)
             <!-- Associated characters -->
             <DetailList Title="Characters"
                         Items="ViewModel?.People"
-                        UrlBase="/people"
+                        UrlBase="/characters"
                         GetItemName="person => person?.Name ?? string.Empty"
                         GetItemUrl="person => person?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
         </div>
@@ -53,13 +57,10 @@ else if (ViewModel?.Species != null)
         @code {
             [Parameter] public string? Id { get; set; }
 
-    private SpecieDetailsViewModel? ViewModel;
-
-        // Initializes the ViewModel and loads species data by ID
-        protected override async Task OnInitializedAsync()
-        {
-            ViewModel = new SpecieDetailsViewModel(SwapiService);
-            var specieId = Id ?? "";
-            await ViewModel.Initialize(specieId);
-        }
+            // Initializes the ViewModel and loads species data by ID
+            protected override async Task OnInitializedAsync()
+            {
+                var specieId = Id ?? "";
+                await ViewModel.InitializeAsync(specieId);
+            }
         }

@@ -10,12 +10,12 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// The list of all people fetched from the service.
         /// </summary>
-        private List<Person> _people = new();
+        private List<Person> People = new();
 
         /// <summary>
         /// The list of filtered people based on the search query.
         /// </summary>
-        private List<Person> _filteredPeople = new();
+        private List<Person> FilteredPeople = new();
 
         /// <summary>
         /// Indicates whether data is currently being loaded.
@@ -25,29 +25,19 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// The current page of the paginated people list.
         /// </summary>
-        public int CurrentPage { get; private set; } = 1;
+        public int CurrentPage { get; set; } = 1;
 
         private const int ItemsPerPage = 8;
 
         /// <summary>
         /// The total number of pages based on the filtered list of people.
         /// </summary>
-        public int TotalPages => (int)Math.Ceiling((double)_filteredPeople.Count / ItemsPerPage);
-
-        /// <summary>
-        /// Indicates if the current page is the first page.
-        /// </summary>
-        public bool IsFirstPage => CurrentPage == 1;
-
-        /// <summary>
-        /// Indicates if the current page is the last page.
-        /// </summary>
-        public bool IsLastPage => CurrentPage == TotalPages;
+        public int TotalPages => (int)Math.Ceiling((double)FilteredPeople.Count / ItemsPerPage);
 
         /// <summary>
         /// A collection of people for the current page, based on pagination.
         /// </summary>
-        public IEnumerable<Person> PaginatedPeople => _filteredPeople
+        public IEnumerable<Person> PaginatedPeople => FilteredPeople
             .Skip((CurrentPage - 1) * ItemsPerPage)
             .Take(ItemsPerPage);
 
@@ -64,15 +54,15 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// Initializes the people view model by fetching the list of people from the service.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
             Loading = true;
 
             try
             {
                 // Fetch all people from the service
-                _people = await _swapiService.GetListAsync<Person>("people") ?? new List<Person>();
-                _filteredPeople = _people;
+                People = await _swapiService.GetListAsync<Person>("people") ?? new List<Person>();
+                FilteredPeople = People;
             }
             catch (Exception ex)
             {
@@ -95,34 +85,18 @@ namespace StarWarsSPA.Presentation.ViewModels
             if (string.IsNullOrWhiteSpace(query))
             {
                 // Reset to the original list of people if the query is empty or whitespace
-                _filteredPeople = _people;
+                FilteredPeople = People;
             }
             else
             {
                 // Filter the people based on the query (case-insensitive)
-                _filteredPeople = _people
+                FilteredPeople = People
                     .Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
             // Always reset to the first page after a search
             CurrentPage = 1;
-        }
-
-        /// <summary>
-        /// Moves to the previous page of paginated people, if possible.
-        /// </summary>
-        public void PrevPage()
-        {
-            if (CurrentPage > 1) CurrentPage--;
-        }
-
-        /// <summary>
-        /// Moves to the next page of paginated people, if possible.
-        /// </summary>
-        public void NextPage()
-        {
-            if (CurrentPage < TotalPages) CurrentPage++;
         }
     }
 }

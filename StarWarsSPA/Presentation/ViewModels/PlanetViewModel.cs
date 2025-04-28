@@ -17,7 +17,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// List of planets after applying filters (e.g., search query).
         /// </summary>
-        public List<Planet> Filtered { get; private set; } = new();
+        public List<Planet> FilteredPlanets { get; private set; } = new();
 
         /// <summary>
         /// Indicates whether data is currently loading.
@@ -27,7 +27,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// The current page of the paginated planets list.
         /// </summary>
-        public int CurrentPage { get; private set; } = 1;
+        public int CurrentPage { get; set; } = 1;
 
         /// <summary>
         /// The number of items to display per page.
@@ -37,12 +37,12 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// Total number of pages based on the filtered list and items per page.
         /// </summary>
-        public int TotalPages => (int)Math.Ceiling((double)Filtered.Count / ItemsPerPage);
+        public int TotalPages => (int)Math.Ceiling((double)FilteredPlanets.Count / ItemsPerPage);
 
         /// <summary>
         /// Gets a paginated list of planets based on the current page.
         /// </summary>
-        public IEnumerable<Planet> PaginatedPlanets => Filtered
+        public IEnumerable<Planet> PaginatedPlanets => FilteredPlanets
             .Skip((CurrentPage - 1) * ItemsPerPage)
             .Take(ItemsPerPage);
 
@@ -59,7 +59,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// Asynchronously loads the list of planets from the service and applies initial filtering.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task LoadPlanetsAsync()
+        public async Task InitializeAsync()
         {
             try
             {
@@ -72,7 +72,7 @@ namespace StarWarsSPA.Presentation.ViewModels
                 Planets = result ?? new List<Planet>();
 
                 // Initially set the filtered list to be the same as the full list
-                Filtered = Planets;
+                FilteredPlanets = Planets;
 
             }
             catch (Exception ex)
@@ -94,25 +94,12 @@ namespace StarWarsSPA.Presentation.ViewModels
         public void HandleSearch(string query)
         {
             // Filter the list based on the search query (case-insensitive)
-            Filtered = Planets
+            FilteredPlanets = Planets
                 .Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
             // Reset the page to the first page after filtering
             CurrentPage = 1;
-        }
-
-        /// <summary>
-        /// Changes the current page of the paginated planets list.
-        /// </summary>
-        /// <param name="newPage">The new page number to set.</param>
-        public void ChangePage(int newPage)
-        {
-            // Ensure the page number is within the valid range
-            if (newPage >= 1 && newPage <= TotalPages)
-            {
-                CurrentPage = newPage;
-            }
         }
     }
 }

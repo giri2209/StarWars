@@ -40,7 +40,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// </summary>
         /// <param name="id">The ID of the planet to load.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task LoadAsync(string id)
+        public async Task InitializeAsync(string id)
         {
             try
             {

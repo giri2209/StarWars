@@ -43,21 +43,27 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// </summary>
         /// <param name="speciesId">The species ID to fetch details for.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Initialize(string speciesId)
+        public async Task InitializeAsync(string speciesId)
         {
             Loading = true;
             try
             {
-                // Fetch the species data asynchronously
                 Species = await _swapiService.GetAsync<Specie>($"species/{speciesId}");
 
-                // If species has films, fetch all related films asynchronously
-                if (Species?.Films != null)
-                    Films = await FetchAll<Film>(Species.Films);
+                // If the specie's films list is not null, fetch the associated films
+                var filmsList = Species?.Films ?? new List<string>(); // Use an empty list if null
+                var residentsList = Species?.People ?? new List<string>(); // Use an empty list if null
 
-                // If species has people, fetch all related people asynchronously
-                if (Species?.People != null)
-                    People = await FetchAll<Person>(Species.People);
+                // Fetch related data concurrently for better performance
+                var filmsTask = _swapiService.GetManyAsync<Film>(filmsList);
+                var residentsTask = _swapiService.GetManyAsync<Person>(residentsList);
+
+                // Wait for both tasks to complete
+                await Task.WhenAll(filmsTask, residentsTask);
+
+                // Assign the fetched data to properties
+                Films = await filmsTask;
+                People = await residentsTask;
             }
             catch (Exception ex)
             {
@@ -68,33 +74,6 @@ namespace StarWarsSPA.Presentation.ViewModels
             {
                 // Set loading to false once data fetching is complete
                 Loading = false;
-            }
-        }
-
-        /// <summary>
-        /// Helper method to fetch a list of items asynchronously from a collection of URLs.
-        /// </summary>
-        /// <typeparam name="T">The type of items to fetch.</typeparam>
-        /// <param name="urls">The URLs to fetch data from.</param>
-        /// <returns>A task representing the asynchronous operation, containing a list of fetched items.</returns>
-        private async Task<List<T>> FetchAll<T>(IEnumerable<string> urls)
-        {
-            // Create a collection of tasks to fetch data asynchronously for each URL
-            var tasks = urls.Select(url => _swapiService.GetAsync<T>(url));
-
-            try
-            {
-                // Wait for all tasks to complete
-                var results = await Task.WhenAll(tasks);
-
-                // Filter out any null results and return a list of non-nullable items
-                return results.Where(result => result != null).ToList()!;
-            }
-            catch (Exception ex)
-            {
-                // Log any error that occurs while fetching the data
-                Console.Error.WriteLine($"Failed to fetch items: {ex.Message}");
-                return new List<T>(); // Return an empty list in case of an error
             }
         }
     }

@@ -1,8 +1,9 @@
 ﻿@page "/planets"
 @using StarWarsSPA.UI.Components
-@using StarWarsSPA.Core.Models
+@using StarWarsSPA.Core.Interfaces
 @using StarWarsSPA.Presentation.ViewModels
 @inject PlanetViewModel ViewModel
+@inject ISwapiService SwapiService
 
 <PageTitle>Planets</PageTitle>
 
@@ -43,19 +44,16 @@
             }
         </div>
 
-        <!-- Pagination -->
         @if (ViewModel?.TotalPages > 1)
         {
             <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
-                <button @onclick="() => ViewModel.ChangePage(ViewModel.CurrentPage - 1)"
+                <button @onclick="() => ViewModel.CurrentPage--"
                         disabled="@(ViewModel.CurrentPage == 1)"
                         class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
                     Prev
                 </button>
-
                 <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
-
-                <button @onclick="() => ViewModel.ChangePage(ViewModel.CurrentPage + 1)"
+                <button @onclick="() => ViewModel.CurrentPage++"
                         disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
                         class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
                     Next
@@ -69,6 +67,7 @@
     // Fetches initial list of planets
     protected override async Task OnInitializedAsync()
     {
-        await ViewModel.LoadPlanetsAsync();
+        ViewModel = new PlanetViewModel(SwapiService);
+        await ViewModel.InitializeAsync();
     }
 }

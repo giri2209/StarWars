@@ -64,7 +64,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// </summary>
         /// <param name="id">The unique identifier of the film to be loaded.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        public async Task LoadAsync(string id)
+        public async Task InitializeAsync(string id)
         {
             try
             {

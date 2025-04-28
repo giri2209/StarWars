@@ -1,8 +1,9 @@
-﻿@page "/people"
+﻿@page "/characters"
 @using StarWarsSPA.UI.Components
 @using StarWarsSPA.Presentation.ViewModels
+@using StarWarsSPA.Core.Interfaces
 @inject PeopleViewModel ViewModel
-
+@inject ISwapiService swapiService
 
 <PageTitle>Characters</PageTitle>
 
@@ -30,7 +31,7 @@
             {
                 // Extract character ID from URL
                 var id = person?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last();
-                <a href="/people/@id" class="bg-black bg-opacity-60 border border-yellow-400 rounded-xl p-4 hover:shadow-yellow-500/50 transition-shadow">
+                <a href="/characters/@id" class="bg-black bg-opacity-60 border border-yellow-400 rounded-xl p-4 hover:shadow-yellow-500/50 transition-shadow">
                     <h2 class="text-xl font-semibold text-yellow-300 mb-2">@person?.Name</h2>
                     <ul class="text-sm space-y-1 text-gray-300">
                         <li><span class="font-bold">Height:</span> @(person?.Height ?? "n/a") cm</li>
@@ -42,13 +43,21 @@
             }
         </div>
 
-        @if (ViewModel.TotalPages > 1)
+        <!-- Pagination controls -->
+        @if (ViewModel?.TotalPages > 1)
         {
-            <!-- Pagination controls -->
-            <div class="mt-10 flex justify-center gap-4 items-center text-yellow-300">
-                <button disabled="@ViewModel.IsFirstPage" @onclick="ViewModel.PrevPage" class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">Prev</button>
+            <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
+                <button @onclick="() => ViewModel.CurrentPage--"
+                        disabled="@(ViewModel.CurrentPage == 1)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
+                    Prev
+                </button>
                 <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
-                <button disabled="@ViewModel.IsLastPage" @onclick="ViewModel.NextPage" class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">Next</button>
+                <button @onclick="() => ViewModel.CurrentPage++"
+                        disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
+                    Next
+                </button>
             </div>
         }
     }
@@ -58,6 +67,7 @@
     // Load characters on component initialization
     protected override async Task OnInitializedAsync()
     {
-        await ViewModel.Initialize();
+        ViewModel = new PeopleViewModel(swapiService);
+        await ViewModel.InitializeAsync();
     }
 }

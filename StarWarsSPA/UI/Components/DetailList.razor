@@ -15,11 +15,20 @@
                 var itemName = GetItemName?.Invoke(item) ?? "Unnamed";
 
                 <!-- Render the Item -->
-                <li>
+            <li>
+                @if (UrlBase == "/pilots")
+                {
+                    <!-- Just render plain text if UrlBase is /pilots -->
+                    <span class="text-yellow-400">@itemName</span>
+                }
+                else
+                {
+                    <!-- Otherwise, render a NavLink -->
                     <NavLink href="@($"{UrlBase}/{itemUrl}")" class="text-yellow-400 hover:underline">
                         @itemName
                     </NavLink>
-                </li>
+                }
+            </li>
             }
         </ul>
     </div>

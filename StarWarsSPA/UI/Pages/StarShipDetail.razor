@@ -2,9 +2,10 @@
 @using StarWarsSPA.UI.Components
 @using StarWarsSPA.Core.Interfaces
 @using StarWarsSPA.Presentation.ViewModels
-@inject ISwapiService SwapiService
+@inject StarShipDetailsViewModel ViewModel
+
 <!-- Page title for browser -->
-<PageTitle>Starship Detail</PageTitle>
+<PageTitle>Starship Details</PageTitle>
 
 <!-- Loading or starship details display -->
 @if (ViewModel.Loading)
@@ -37,8 +38,19 @@ else if (ViewModel.Starship != null)
             </div>
 
             <!-- Pilots and Films list -->
-            <DetailList Title="Pilots" Items="ViewModel.Pilots" LinkBase="/people" />
-            <DetailList Title="Appears In" Items="ViewModel.Films" LinkBase="/films" />
+            <DetailList Title="Pilots"
+                        Items="ViewModel.Pilots"
+                        UrlBase="/pilots"
+                        GetItemName="pilot => pilot?.Name ?? string.Empty"
+                        GetItemUrl="pilot => pilot?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+            <DetailList Title="Films"
+                        Items="ViewModel.Films"
+                        UrlBase="/films"
+                        GetItemName="film => film?.Title ?? string.Empty"
+                        GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+
         </div>
     </div>
 }
@@ -46,13 +58,10 @@ else if (ViewModel.Starship != null)
 @code {
     [Parameter] public string? Id { get; set; }
 
-    // ViewModel for starship details
-    public StarShipDetailsViewModel ViewModel { get; set; } = new();
-
     // Initialization: fetch the starship data by Id
     protected override async Task OnInitializedAsync()
     {
         var starShipId = Id ?? "";
-        await ViewModel.Initialize(SwapiService, starShipId);
+        await ViewModel.InitializeAsync(starShipId);
     }
 }

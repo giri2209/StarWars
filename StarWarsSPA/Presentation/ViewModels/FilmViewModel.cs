@@ -28,7 +28,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// Gets or sets the current page number for pagination.
         /// </summary>
-        public int CurrentPage { get; private set; } = 1;
+        public int CurrentPage { get; set; } = 1;
 
         private const int ItemsPerPage = 6;
 
@@ -81,7 +81,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// Filters the list of films based on the provided search query.
         /// </summary>
         /// <param name="query">The search query used to filter the films by title.</param>
-        public void Search(string query)
+        public void HandleSearch(string query)
         {
             // Filter films based on query
             FilteredFilms = Films
@@ -91,12 +91,6 @@ namespace StarWarsSPA.Presentation.ViewModels
             // Reset to first page on search
             CurrentPage = 1;
         }
-
-        /// <summary>
-        /// Sets the current page for pagination.
-        /// </summary>
-        /// <param name="page">The page number to set.</param>
-        public void SetPage(int page) => CurrentPage = page;
     }
 }
 

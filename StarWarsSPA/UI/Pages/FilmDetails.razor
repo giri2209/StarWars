@@ -24,7 +24,7 @@
 
             <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300">
                 @* Characters *@
-                <DetailList Title="Persons" Items="ViewModel.Characters" UrlBase="/people" GetItemName="p => p.Name"
+                <DetailList Title="Characters" Items="ViewModel.Characters" UrlBase="/characters" GetItemName="p => p.Name"
                             GetItemUrl="p => (p.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()) ?? string.Empty" />
                 @* Starships *@
                 <DetailList Title="Starships" Items="ViewModel.Starships" UrlBase="/starships" GetItemName="starShip => starShip.Name"
@@ -46,6 +46,6 @@
     protected override async Task OnInitializedAsync()
     {
         var filmId = Id ?? ""; <!-- Assign the film ID, fallback to empty string if null -->
-        await ViewModel.LoadAsync(filmId); <!-- Call the ViewModel's LoadAsync method to load film details using the ID -->
+        await ViewModel.InitializeAsync(filmId); <!-- Call the ViewModel's LoadAsync method to load film details using the ID -->
     }
 }

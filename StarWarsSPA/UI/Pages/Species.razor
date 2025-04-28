@@ -2,7 +2,9 @@
 @using StarWarsSPA.UI.Components
 @using StarWarsSPA.Core.Interfaces
 @using StarWarsSPA.Presentation.ViewModels
+@inject SpeciesViewModel ViewModel
 @inject ISwapiService SwapiService
+
 <!-- Page title for browser -->
 <PageTitle>Species</PageTitle>
 
@@ -12,7 +14,7 @@
     <h1 class="text-4xl font-bold text-yellow-400 text-center mb-6">Species</h1>
 
     <!-- Search input bound to ViewModel -->
-    <SearchBar Placeholder="Search species..." OnSearch="HandleSearch" />
+    <SearchBar Placeholder="Search species..." OnSearch="ViewModel.HandleSearch" />
 
     <!-- Loading indicator -->
     @if (ViewModel?.Loading == true)
@@ -65,18 +67,11 @@
 </div>
 
 @code {
-    private SpeciesViewModel? ViewModel;
 
     // Initializes ViewModel and loads species data
     protected override async Task OnInitializedAsync()
     {
         ViewModel = new SpeciesViewModel(SwapiService);
-        await ViewModel.Initialize();
-    }
-
-    // Handles search input from the SearchBar component
-    private void HandleSearch(string query)
-    {
-        ViewModel?.HandleSearch(query);
+        await ViewModel.InitializeAsync();
     }
 }

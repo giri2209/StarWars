@@ -1,4 +1,4 @@
-﻿@page "/people/{Id}"
+﻿@page "/characters/{Id}"
 @using StarWarsSPA.UI.Components
 @using StarWarsSPA.Presentation.ViewModels
 @inject PeopleDetailViewModel ViewModel
@@ -65,6 +65,6 @@
     protected override async Task OnInitializedAsync()
     {
         var peopleId = Id ?? "";
-        await ViewModel.Initialize(peopleId);
+        await ViewModel.InitializeAsync(peopleId);
     }
 }

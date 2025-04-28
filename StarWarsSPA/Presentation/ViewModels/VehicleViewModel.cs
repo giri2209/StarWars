@@ -10,12 +10,12 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// The list of all vehicles fetched from the service.
         /// </summary>
-        private List<Vehicle> _vehicles = new();
+        private List<Vehicle> Vehicles = new();
 
         /// <summary>
         /// The list of filtered vehicles based on the search query.
         /// </summary>
-        private List<Vehicle> _filteredVehicles = new();
+        private List<Vehicle> FilteredVehicles = new();
 
         /// <summary>
         /// Indicates whether data is currently being loaded.
@@ -25,14 +25,14 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// The current page of the paginated vehicles.
         /// </summary>
-        public int CurrentPage { get; private set; } = 1;
+        public int CurrentPage { get; set; } = 1;
 
         private const int ItemsPerPage = 9;
 
         /// <summary>
         /// The total number of pages based on the filtered list of vehicles.
         /// </summary>
-        public int TotalPages => (int)Math.Ceiling((double)_filteredVehicles.Count / ItemsPerPage);
+        public int TotalPages => (int)Math.Ceiling((double)FilteredVehicles.Count / ItemsPerPage);
 
         /// <summary>
         /// Indicates if the current page is the first page.
@@ -47,7 +47,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// A collection of vehicles for the current page, based on pagination.
         /// </summary>
-        public IEnumerable<Vehicle> PaginatedVehicles => _filteredVehicles
+        public IEnumerable<Vehicle> PaginatedVehicles => FilteredVehicles
             .Skip((CurrentPage - 1) * ItemsPerPage)
             .Take(ItemsPerPage);
 
@@ -64,15 +64,15 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// Initializes the vehicle view model by fetching the list of vehicles.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
             Loading = true;
 
             try
             {
                 // Fetch all vehicles from the service
-                _vehicles = await _swapiService.GetListAsync<Vehicle>("vehicles") ?? new List<Vehicle>();
-                _filteredVehicles = _vehicles;
+                Vehicles = await _swapiService.GetListAsync<Vehicle>("vehicles") ?? new List<Vehicle>();
+                FilteredVehicles = Vehicles;
             }
             catch (Exception ex)
             {
@@ -95,34 +95,18 @@ namespace StarWarsSPA.Presentation.ViewModels
             if (string.IsNullOrWhiteSpace(query))
             {
                 // Reset to the original list of vehicles if the query is empty or whitespace
-                _filteredVehicles = _vehicles;
+                FilteredVehicles = Vehicles;
             }
             else
             {
                 // Filter the vehicles based on the query (case-insensitive)
-                _filteredVehicles = _vehicles
+                FilteredVehicles = Vehicles
                     .Where(v => !string.IsNullOrEmpty(v.Name) && v.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
             // Always reset to the first page after a search
             CurrentPage = 1;
-        }
-
-        /// <summary>
-        /// Moves to the previous page of paginated vehicles, if possible.
-        /// </summary>
-        public void PreviousPage()
-        {
-            if (CurrentPage > 1) CurrentPage--;
-        }
-
-        /// <summary>
-        /// Moves to the next page of paginated vehicles, if possible.
-        /// </summary>
-        public void NextPage()
-        {
-            if (CurrentPage < TotalPages) CurrentPage++;
         }
 
         /// <summary>

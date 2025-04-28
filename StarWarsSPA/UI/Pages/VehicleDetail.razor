@@ -2,7 +2,11 @@
 @using StarWarsSPA.UI.Components
 @using StarWarsSPA.Core.Interfaces
 @using StarWarsSPA.Presentation.ViewModels
-@inject ISwapiService SwapiService
+@inject VehicleDetailViewModel ViewModel
+
+<!-- Page title for browser -->
+<PageTitle>Vehicle Details</PageTitle>
+
 <!-- Display loading message while the vehicle data is being fetched -->
 @if (ViewModel?.Loading == true)
 {
@@ -48,18 +52,12 @@ else if (ViewModel?.Vehicle != null)
 
         @code {
             // The Id parameter to capture the vehicle's unique identifier from the URL
-            [Parameter] public string Id { get; set; } = string.Empty;
+            [Parameter] public string? Id { get; set; }
 
-// ViewModel instance for vehicle details
-private VehicleDetailViewModel? ViewModel;
-
-        // Initializes the ViewModel and loads the vehicle details asynchronously using the provided Id
-        protected override async Task OnInitializedAsync()
-        {
-            ViewModel = new VehicleDetailViewModel(SwapiService);
-            await ViewModel.InitializeAsync(Id);
-        }
-
-        // Helper method to extract the ID from a URL
-        private string GetIdFromUrl(string url) => url.Trim('/').Split('/').Last();
+            // Initializes the ViewModel and loads the vehicle details asynchronously using the provided Id
+            protected override async Task OnInitializedAsync()
+            {
+                var vehicleId = Id ?? "";
+                await ViewModel.InitializeAsync(vehicleId);
+            }
         }

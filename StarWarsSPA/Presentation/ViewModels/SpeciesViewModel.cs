@@ -17,7 +17,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// List of species after filtering by search query.
         /// </summary>
-        public List<Specie> Filtered { get; private set; } = new List<Specie>();
+        public List<Specie> FilteredSpecies { get; private set; } = new List<Specie>();
 
         /// <summary>
         /// The current page number for pagination.
@@ -37,12 +37,12 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <summary>
         /// Gets the total number of pages based on the filtered species.
         /// </summary>
-        public int TotalPages => (int)Math.Ceiling((double)Filtered.Count / ItemsPerPage);
+        public int TotalPages => (int)Math.Ceiling((double)FilteredSpecies.Count / ItemsPerPage);
 
         /// <summary>
         /// Gets the species for the current page based on pagination.
         /// </summary>
-        public IEnumerable<Specie> PaginatedSpecies => Filtered.Skip((CurrentPage - 1) * ItemsPerPage).Take(ItemsPerPage);
+        public IEnumerable<Specie> PaginatedSpecies => FilteredSpecies.Skip((CurrentPage - 1) * ItemsPerPage).Take(ItemsPerPage);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpeciesViewModel"/> class.
@@ -57,32 +57,24 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// Initializes the species list by fetching data from the API and handling pagination.
         /// </summary>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
             Loading = true;
             var allSpecies = new List<Specie>();
-            var url = "species";
 
             try
             {
-                while (!string.IsNullOrEmpty(url))
-                {
                     // Fetch a list of species from the API
-                    var response = await _swapiService.GetListAsync<Specie>(url);
+                    var response = await _swapiService.GetListAsync<Specie>("species");
                     if (response.Any())
                     {
-                        allSpecies.AddRange(response);
-                        url = response.LastOrDefault()?.Url; // Get the next URL if pagination is available
+                        allSpecies = response;
                     }
-                    else
-                    {
-                        break;
-                    }
-                }
+        
 
                 // Store the fetched species and set the filtered list to be the same initially
                 Species = allSpecies;
-                Filtered = allSpecies;
+                FilteredSpecies = allSpecies;
             }
             catch (Exception ex)
             {
@@ -101,7 +93,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <param name="query">The search query string.</param>
         public void HandleSearch(string query)
         {
-            Filtered = Species
+            FilteredSpecies = Species
                 .Where(s => !string.IsNullOrEmpty(s.Name) && s.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
                 .ToList();
             CurrentPage = 1; // Reset to the first page after search

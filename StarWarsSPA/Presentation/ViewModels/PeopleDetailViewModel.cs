@@ -51,7 +51,7 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// </summary>
         /// <param name="id">The identifier for the person (character).</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Initialize(string id)
+        public async Task InitializeAsync(string id)
         {
             try
             {

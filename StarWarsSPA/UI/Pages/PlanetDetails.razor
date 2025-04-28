@@ -3,7 +3,8 @@
 @using StarWarsSPA.Presentation.ViewModels
 @inject PlanetDetailsViewModel ViewModel
 
-<PageTitle>@ViewModel.Planet?.Name</PageTitle>
+<!-- Page title for browser -->
+<PageTitle>Planet Details</PageTitle>
 
 <!-- Page background and layout -->
 <div class="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white px-6 py-8">
@@ -22,7 +23,7 @@
 
                 <!-- Planet name -->
                 <h1 class="text-3xl font-bold text-yellow-400 mb-3">@ViewModel.Planet.Name</h1>
-                <p class="text-sm text-gray-300 mb-4">@ViewModel.Planet.Diameter km</p>
+                <p class="text-sm text-gray-300 mb-4"><span class="text-yellow-400">Diameter:</span>@ViewModel.Planet.Diameter km</p>
 
                 <!-- Planet stats -->
                 <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300 mb-6">
@@ -45,9 +46,9 @@
                             GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
 
                 <!-- Related residents -->
-                <DetailList Title="Residents"
+                <DetailList Title="Characters"
                             Items="ViewModel.Residents"
-                            UrlBase="/people"
+                            UrlBase="/characters"
                             GetItemName="resident => resident.Name"
                             GetItemUrl="resident => resident?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
             </div>
@@ -57,10 +58,9 @@
 
         @code {
             [Parameter] public string? Id { get; set; }
-
-    protected override async Task OnParametersSetAsync()
-        {
-            var planetId = Id ?? "";
-            await ViewModel.LoadAsync(planetId);
-        }
+            protected override async Task OnInitializedAsync()
+            {
+                var planetId = Id ?? "";
+                await ViewModel.InitializeAsync(planetId);
+            }
         }

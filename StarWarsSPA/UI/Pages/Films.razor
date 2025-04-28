@@ -1,9 +1,11 @@
 ﻿@page "/films"
 @using StarWarsSPA.UI.Components
 @using StarWarsSPA.Presentation.ViewModels
+@using StarWarsSPA.Core.Interfaces
 @inject FilmViewModel ViewModel
+@inject ISwapiService swapiService
 
-<PageTitle>Star Wars Films</PageTitle>
+<PageTitle>Films</PageTitle>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white p-6">
     <BreadCrumbs />
@@ -12,7 +14,7 @@
 
     <div class="flex justify-center mb-6">
         <!-- SearchBar triggers HandleSearch to filter films -->
-        <SearchBar OnSearch="HandleSearch" Placeholder="Search films..." />
+        <SearchBar OnSearch="ViewModel.HandleSearch" Placeholder="Search films..." />
     </div>
 
     @if (ViewModel.Loading)
@@ -37,13 +39,21 @@
             }
         </div>
 
-        @if (ViewModel.TotalPages > 1)
+        <!-- Pagination controls -->
+        @if (ViewModel?.TotalPages > 1)
         {
-            <!-- Pagination controls -->
-            <div class="mt-10 flex justify-center gap-4 items-center text-yellow-300">
-                <button disabled="@(ViewModel.CurrentPage == 1)" @onclick="() => ViewModel.SetPage(ViewModel.CurrentPage - 1)" class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">Prev</button>
+            <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
+                <button @onclick="() => ViewModel.CurrentPage--"
+                        disabled="@(ViewModel.CurrentPage == 1)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
+                    Prev
+                </button>
                 <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
-                <button disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)" @onclick="() => ViewModel.SetPage(ViewModel.CurrentPage + 1)" class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">Next</button>
+                <button @onclick="() => ViewModel.CurrentPage++"
+                        disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
+                    Next
+                </button>
             </div>
         }
     }
@@ -53,12 +63,7 @@
     // Load films when component is initialized
     protected override async Task OnInitializedAsync()
     {
+        ViewModel = new FilmViewModel(swapiService);
         await ViewModel.InitializeAsync();
-    }
-
-    // Handle search queries
-    private void HandleSearch(string query)
-    {
-        ViewModel.Search(query);
     }
 }

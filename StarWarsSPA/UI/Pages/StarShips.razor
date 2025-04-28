@@ -2,7 +2,9 @@
 @using StarWarsSPA.UI.Components
 @using StarWarsSPA.Core.Interfaces
 @using StarWarsSPA.Presentation.ViewModels
+@inject StarShipViewModel ViewModel
 @inject ISwapiService SwapiService
+
 <!-- Page title for browser -->
 <PageTitle>Starships</PageTitle>
 
@@ -13,10 +15,10 @@
     <h1 class="text-4xl font-bold text-yellow-400 text-center mb-6">Starships</h1>
 
     <!-- Search bar for filtering starships -->
-    <SearchBar Placeholder="Search starships..." OnSearch="ViewModel.Search" />
+    <SearchBar Placeholder="Search starships..." OnSearch="ViewModel.HandleSearch" />
 
     <!-- Loading indicator while starships data is being fetched -->
-    @if (ViewModel.IsLoading)
+    @if (ViewModel.Loading)
     {
         <p class="text-center mt-10 text-gray-400">Loading starships...</p>
     }
@@ -24,7 +26,7 @@
     {
         <!-- Display starships in a grid layout -->
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
-            @foreach (var ship in ViewModel.Paginated)
+            @foreach (var ship in ViewModel.PaginatedStarships)
             {
                 <!-- Navigate to each starship detail page -->
                 <NavLink class="bg-black bg-opacity-60 border border-yellow-400 rounded-xl p-4 hover:shadow-yellow-500/40 transition-shadow"
@@ -37,18 +39,18 @@
         </div>
 
         <!-- Pagination controls -->
-        @if (ViewModel.TotalPages > 1)
+        @if (ViewModel?.TotalPages > 1)
         {
             <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
-                <button class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition"
-                        @onclick="() => ViewModel.ChangePage(-1)"
-                        disabled="@(ViewModel.CurrentPage == 1)">
+                <button @onclick="() => ViewModel.CurrentPage--"
+                        disabled="@(ViewModel.CurrentPage == 1)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
                     Prev
                 </button>
                 <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
-                <button class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition"
-                        @onclick="() => ViewModel.ChangePage(1)"
-                        disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)">
+                <button @onclick="() => ViewModel.CurrentPage++"
+                        disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
+                        class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
                     Next
                 </button>
             </div>
@@ -57,12 +59,11 @@
 </div>
 
 @code {
-    // ViewModel instance for the starship list
-    private StarShipViewModel ViewModel { get; set; } = new();
 
     // Initialization method to load starship data
     protected override async Task OnInitializedAsync()
     {
-        await ViewModel.Initialize(SwapiService);
+        ViewModel = new StarShipViewModel(SwapiService);
+        await ViewModel.InitializeAsync(SwapiService);
     }
 }
