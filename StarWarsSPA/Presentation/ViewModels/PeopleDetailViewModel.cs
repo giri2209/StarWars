@@ -37,6 +37,11 @@ namespace StarWarsSPA.Presentation.ViewModels
         public bool Loading { get; private set; } = true;
 
         /// <summary>
+        /// Contains an error message in case there is an issue loading the Character data.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PeopleDetailViewModel"/> class.
         /// </summary>
         /// <param name="swapiService">The service used to fetch data related to the person.</param>
@@ -82,8 +87,8 @@ namespace StarWarsSPA.Presentation.ViewModels
             catch (Exception ex)
             {
                 // Handle any errors that occur during the data fetch
-                // You can log the error or handle it appropriately
-                Console.WriteLine($"Error fetching data for person {id}: {ex.Message}");
+                ErrorMessage = "Failed to load Character details or does not exist.";
+                Console.WriteLine($"Error loading Character details: {ex.Message}");
             }
             finally
             {

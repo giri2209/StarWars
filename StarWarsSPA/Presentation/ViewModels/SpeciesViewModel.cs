@@ -40,9 +40,25 @@ namespace StarWarsSPA.Presentation.ViewModels
         public int TotalPages => (int)Math.Ceiling((double)FilteredSpecies.Count / ItemsPerPage);
 
         /// <summary>
+        /// Indicates if the current page is the first page.
+        /// </summary>
+        public bool IsFirstPage => CurrentPage == 1;
+
+        /// <summary>
+        /// Indicates if the current page is the last page.
+        /// </summary>
+        public bool IsLastPage => CurrentPage == TotalPages;
+
+
+        /// <summary>
         /// Gets the species for the current page based on pagination.
         /// </summary>
         public IEnumerable<Specie> PaginatedSpecies => FilteredSpecies.Skip((CurrentPage - 1) * ItemsPerPage).Take(ItemsPerPage);
+
+        /// <summary>
+        /// Stores any error message encountered during data loading.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpeciesViewModel"/> class.
@@ -78,6 +94,7 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
+                ErrorMessage = "Failed to load Species. Please try again later.";
                 // Log any errors encountered during data fetching
                 Console.Error.WriteLine($"Failed to load species: {ex.Message}");
             }
@@ -93,10 +110,28 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <param name="query">The search query string.</param>
         public void HandleSearch(string query)
         {
-            FilteredSpecies = Species
-                .Where(s => !string.IsNullOrEmpty(s.Name) && s.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-            CurrentPage = 1; // Reset to the first page after search
+            FilteredSpecies = string.IsNullOrWhiteSpace(query) ? Species
+            : Species.Where(s => !string.IsNullOrEmpty(s.Name) && s.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+             .ToList();
+
+            CurrentPage = 1;
+
+        }
+
+        public void GoToNextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                CurrentPage++;
+            }
+        }
+
+        public void GoToPreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
         }
     }
 }

@@ -30,6 +30,11 @@ namespace StarWarsSPA.Presentation.ViewModels
         public bool Loading { get; private set; }
 
         /// <summary>
+        /// Contains an error message in case there is an issue loading the Planet data.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PlanetDetailsViewModel"/> class.
         /// </summary>
         /// <param name="swapiService">The service used to fetch the planet data.</param>
@@ -66,9 +71,8 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
-                // Handle any errors that occur during the data fetch
-                // You can log the error or handle it appropriately
-                Console.WriteLine($"Error fetching planet details: {ex.Message}");
+                ErrorMessage = "Failed to load Planet details or does not exist.";
+                Console.WriteLine($"Error loading Planet details: {ex.Message}");
             }
             finally
             {

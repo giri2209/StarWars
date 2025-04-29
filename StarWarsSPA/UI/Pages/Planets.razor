@@ -19,16 +19,20 @@
     <!-- Search input -->
     <SearchBar OnSearch="ViewModel.HandleSearch" Placeholder="Search planets..." />
 
-    @if (ViewModel?.Loading == true)
+    @if (ViewModel.Loading == true)
     {
         <!-- Loading state -->
         <p class="text-center mt-10 text-gray-400">Loading planets...</p>
+    }
+    else if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+    {
+        <p class="text-center mt-10 text-yellow-400 font-semibold">@ViewModel.ErrorMessage</p>
     }
     else
     {
         <!-- Planet grid -->
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
-            @if (ViewModel?.PaginatedPlanets != null)
+            @if (ViewModel.PaginatedPlanets != null)
             {
                 foreach (var planet in ViewModel.PaginatedPlanets)
                 {
@@ -44,22 +48,24 @@
             }
         </div>
 
+        <!-- Pagination controls -->
         @if (ViewModel?.TotalPages > 1)
         {
             <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
-                <button @onclick="() => ViewModel.CurrentPage--"
-                        disabled="@(ViewModel.CurrentPage == 1)"
+                <button @onclick="ViewModel.GoToPreviousPage"
+                        disabled="@(ViewModel.IsFirstPage)"
                         class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
                     Prev
                 </button>
                 <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
-                <button @onclick="() => ViewModel.CurrentPage++"
-                        disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
+                <button @onclick="ViewModel.GoToNextPage"
+                        disabled="@(ViewModel.IsLastPage)"
                         class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
                     Next
                 </button>
             </div>
         }
+
     }
 </div>
 

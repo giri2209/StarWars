@@ -3,61 +3,65 @@
 @using StarWarsSPA.Core.Interfaces
 @using StarWarsSPA.Presentation.ViewModels
 @inject VehicleDetailViewModel ViewModel
-
 <!-- Page title for browser -->
 <PageTitle>Vehicle Details</PageTitle>
 
-<!-- Display loading message while the vehicle data is being fetched -->
-@if (ViewModel?.Loading == true)
-{
-    <p class="text-center text-gray-400 mt-20">Loading vehicle...</p>
-}
-else if (ViewModel?.Vehicle != null)
-{
-    <div class="min-h-screen bg-gradient-to-br from-gray-950 to-black text-white px-6 py-8">
-        <BreadCrumbs />
-        <!-- Main content container with black background and yellow border -->
-        <div class="max-w-4xl mx-auto bg-black bg-opacity-70 border border-yellow-400 rounded-2xl p-6 shadow-xl">
-            <!-- Grid layout for vehicle details -->
-            <h1 class="text-3xl font-bold text-yellow-400 mb-3">@ViewModel?.Vehicle?.Name</h1>
-            <p class="text-sm text-gray-300 mb-4"><span class="text-yellow-400">Class:</span> @ViewModel?.Vehicle?.VehicleClass</p>
-            <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300 mb-6">
-                <div>
-                    <p><span class="text-yellow-400">Model:</span> @ViewModel?.Vehicle?.Model</p>
-                    <p><span class="text-yellow-400">Manufacturer:</span> @ViewModel?.Vehicle?.Manufacturer</p>
-                    <p><span class="text-yellow-400">Cost in Credits:</span> @ViewModel?.Vehicle?.CostInCredits</p>
+<div class="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white p-6">
+
+    <BreadCrumbs />
+    <!-- Display loading message while the vehicle data is being fetched -->
+    @if (ViewModel.Loading == true)
+    {
+        <p class="text-center text-gray-400 mt-20">Loading vehicle...</p>
+    }
+    else if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+    {
+        <p class="text-center mt-10 text-yellow-400 font-semibold">@ViewModel.ErrorMessage</p>
+    }
+    else if (ViewModel?.Vehicle != null)
+    {
+            <!-- Main content container with black background and yellow border -->
+            <div class="max-w-4xl mx-auto bg-black bg-opacity-70 border border-yellow-400 rounded-2xl p-6 shadow-xl">
+                <!-- Grid layout for vehicle details -->
+                <h1 class="text-3xl font-bold text-yellow-400 mb-3">@ViewModel.Vehicle.Name</h1>
+                <p class="text-sm text-gray-300 mb-4"><span class="text-yellow-400">Class:</span> @ViewModel.Vehicle.VehicleClass</p>
+                <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300 mb-6">
+                    <div>
+                        <p><span class="text-yellow-400">Model:</span> @ViewModel.Vehicle.Model</p>
+                        <p><span class="text-yellow-400">Manufacturer:</span> @ViewModel.Vehicle.Manufacturer</p>
+                        <p><span class="text-yellow-400">Cost in Credits:</span> @ViewModel.Vehicle.CostInCredits</p>
+                    </div>
+                    <div>
+                        <p><span class="text-yellow-400">Length:</span> @ViewModel.Vehicle.Length meters</p>
+                        <p><span class="text-yellow-400">Max Speed:</span> @ViewModel.Vehicle.MaxAtmospheringSpeed km/h</p>
+                        <p><span class="text-yellow-400">Crew:</span> @ViewModel.Vehicle.Crew</p>
+                    </div>
                 </div>
-                <div>
-                    <p><span class="text-yellow-400">Length:</span> @ViewModel?.Vehicle?.Length meters</p>
-                    <p><span class="text-yellow-400">Max Speed:</span> @ViewModel?.Vehicle?.MaxAtmospheringSpeed km/h</p>
-                    <p><span class="text-yellow-400">Crew:</span> @ViewModel?.Vehicle?.Crew</p>
-                </div>
+
+                <!-- Display lists of related films and pilots using DetailList component -->
+                <DetailList Title="Films"
+                            Items="ViewModel.Films"
+                            UrlBase="/films"
+                            GetItemName="film => film.Title"
+                            GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+                <DetailList Title="Pilots"
+                            Items="ViewModel.Pilots"
+                            UrlBase="/pilots"
+                            GetItemName="pilot => pilot.Name"
+                            GetItemUrl="pilot => pilot?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
             </div>
-
-            <!-- Display lists of related films and pilots using DetailList component -->
-            <DetailList Title="Films"
-                        Items="ViewModel?.Films"
-                        UrlBase="/films"
-                        GetItemName="film => film.Title"
-                        GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
-
-            <DetailList Title="Pilots"
-                        Items="ViewModel?.Pilots"
-                        UrlBase="/pilots"
-                        GetItemName="pilot => pilot.Name"
-                        GetItemUrl="pilot => pilot?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+    }
         </div>
-        </div>
-        }
 
-        @code {
-            // The Id parameter to capture the vehicle's unique identifier from the URL
-            [Parameter] public string? Id { get; set; }
+    @code {
+        // The Id parameter to capture the vehicle's unique identifier from the URL
+        [Parameter] public string? Id { get; set; }
 
-            // Initializes the ViewModel and loads the vehicle details asynchronously using the provided Id
-            protected override async Task OnInitializedAsync()
-            {
-                var vehicleId = Id ?? "";
-                await ViewModel.InitializeAsync(vehicleId);
-            }
+        // Initializes the ViewModel and loads the vehicle details asynchronously using the provided Id
+        protected override async Task OnInitializedAsync()
+        {
+            var vehicleId = Id ?? "";
+            await ViewModel.InitializeAsync(vehicleId);
         }
+    }

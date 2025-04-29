@@ -23,6 +23,10 @@
         <!-- Loading state -->
         <p class="text-center mt-10 text-gray-400">Loading characters...</p>
     }
+    else if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+    {
+        <p class="text-center mt-10 text-yellow-400 font-semibold">@ViewModel.ErrorMessage</p>
+    }
     else
     {
         <!-- Grid of character cards -->
@@ -47,19 +51,20 @@
         @if (ViewModel?.TotalPages > 1)
         {
             <div class="mt-10 flex justify-center items-center gap-4 text-yellow-300">
-                <button @onclick="() => ViewModel.CurrentPage--"
-                        disabled="@(ViewModel.CurrentPage == 1)"
+                <button @onclick="ViewModel.GoToPreviousPage"
+                        disabled="@(ViewModel.IsFirstPage)"
                         class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
                     Prev
                 </button>
                 <span class="text-white">Page @ViewModel.CurrentPage of @ViewModel.TotalPages</span>
-                <button @onclick="() => ViewModel.CurrentPage++"
-                        disabled="@(ViewModel.CurrentPage == ViewModel.TotalPages)"
+                <button @onclick="ViewModel.GoToNextPage"
+                        disabled="@(ViewModel.IsLastPage)"
                         class="px-4 py-2 bg-yellow-600 rounded-lg disabled:opacity-30 hover:bg-yellow-500 transition">
                     Next
                 </button>
             </div>
         }
+
     }
 </div>
 

@@ -35,11 +35,27 @@ namespace StarWarsSPA.Presentation.ViewModels
         public int TotalPages => (int)Math.Ceiling((double)FilteredPeople.Count / ItemsPerPage);
 
         /// <summary>
+        /// Indicates if the current page is the first page.
+        /// </summary>
+        public bool IsFirstPage => CurrentPage == 1;
+
+        /// <summary>
+        /// Indicates if the current page is the last page.
+        /// </summary>
+        public bool IsLastPage => CurrentPage == TotalPages;
+
+
+        /// <summary>
         /// A collection of people for the current page, based on pagination.
         /// </summary>
         public IEnumerable<Person> PaginatedPeople => FilteredPeople
             .Skip((CurrentPage - 1) * ItemsPerPage)
             .Take(ItemsPerPage);
+
+        /// <summary>
+        /// Stores any error message encountered during data loading.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PeopleViewModel"/> class.
@@ -66,9 +82,9 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
+                ErrorMessage = "Failed to load Characters. Please try again later.";
                 // Log any errors that occur during the fetching process
-                Console.Error.WriteLine($"Failed to load people: {ex.Message}");
-                // Optionally, you could add a user-friendly error message or log it to a system
+                Console.Error.WriteLine($"Failed to load Characters: {ex.Message}");
             }
             finally
             {
@@ -82,21 +98,27 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <param name="query">The search query entered by the user.</param>
         public void HandleSearch(string query)
         {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                // Reset to the original list of people if the query is empty or whitespace
-                FilteredPeople = People;
-            }
-            else
-            {
-                // Filter the people based on the query (case-insensitive)
-                FilteredPeople = People
-                    .Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
+            FilteredPeople = string.IsNullOrWhiteSpace(query) ? People
+            : People.Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
-            // Always reset to the first page after a search
             CurrentPage = 1;
+        }
+
+        public void GoToNextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                CurrentPage++;
+            }
+        }
+
+        public void GoToPreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
         }
     }
 }

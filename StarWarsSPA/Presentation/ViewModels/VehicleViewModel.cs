@@ -52,6 +52,11 @@ namespace StarWarsSPA.Presentation.ViewModels
             .Take(ItemsPerPage);
 
         /// <summary>
+        /// Stores any error message encountered during data loading.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VehicleViewModel"/> class.
         /// </summary>
         /// <param name="swapiService">The service used to fetch vehicle data.</param>
@@ -76,9 +81,9 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
+                ErrorMessage = "Failed to load Vehicles. Please try again later.";
                 // Log any errors that occur during the fetching process
                 Console.Error.WriteLine($"Failed to load vehicles: {ex.Message}");
-                // Optionally, you could add a user-friendly error message or log it to a system
             }
             finally
             {
@@ -92,21 +97,12 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <param name="query">The search query entered by the user.</param>
         public void HandleSearch(string query)
         {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                // Reset to the original list of vehicles if the query is empty or whitespace
-                FilteredVehicles = Vehicles;
-            }
-            else
-            {
-                // Filter the vehicles based on the query (case-insensitive)
-                FilteredVehicles = Vehicles
-                    .Where(v => !string.IsNullOrEmpty(v.Name) && v.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
+            FilteredVehicles = string.IsNullOrWhiteSpace(query) ? Vehicles
+            : Vehicles.Where(v => !string.IsNullOrEmpty(v.Name) && v.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+              .ToList();
 
-            // Always reset to the first page after a search
             CurrentPage = 1;
+
         }
 
         /// <summary>
@@ -116,5 +112,21 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <returns>The extracted ID from the URL.</returns>
         public string GetIdFromUrl(string url) =>
             url.TrimEnd('/').Split('/').Last();
+
+        public void GoToNextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                CurrentPage++;
+            }
+        }
+
+        public void GoToPreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
+        }
     }
 }

@@ -32,6 +32,12 @@ namespace StarWarsSPA.Presentation.ViewModels
 
         private const int ItemsPerPage = 6;
 
+
+        /// <summary>
+        /// Stores any error message encountered during data loading.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FilmViewModel"/> class.
         /// </summary>
@@ -45,6 +51,17 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// Gets the total number of pages for the filtered list of films.
         /// </summary>
         public int TotalPages => (int)Math.Ceiling(FilteredFilms.Count / (double)ItemsPerPage);
+
+        /// <summary>
+        /// Indicates if the current page is the first page.
+        /// </summary>
+        public bool IsFirstPage => CurrentPage == 1;
+
+        /// <summary>
+        /// Indicates if the current page is the last page.
+        /// </summary>
+        public bool IsLastPage => CurrentPage == TotalPages;
+
 
         /// <summary>
         /// Gets the films for the current page, based on pagination.
@@ -67,8 +84,7 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
-                // Handle the error gracefully, e.g., show a message to the user
-                // You could also log the exception here for debugging purposes
+                ErrorMessage = "Failed to load films. Please try again later.";
                 Console.WriteLine($"Error loading films: {ex.Message}");
             }
             finally
@@ -83,14 +99,29 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <param name="query">The search query used to filter the films by title.</param>
         public void HandleSearch(string query)
         {
-            // Filter films based on query
-            FilteredFilms = Films
-                .Where(f => !string.IsNullOrEmpty(f.Title) && f.Title.Contains(query, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            FilteredFilms = string.IsNullOrWhiteSpace(query) ? Films
+            : Films.Where(f => !string.IsNullOrEmpty(f.Title) && f.Title.Contains(query, StringComparison.OrdinalIgnoreCase))
+               .ToList();
 
-            // Reset to first page on search
             CurrentPage = 1;
         }
+
+        public void GoToNextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                CurrentPage++;
+            }
+        }
+
+        public void GoToPreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
+        }
+
     }
 }
 

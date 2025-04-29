@@ -32,6 +32,11 @@ namespace StarWarsSPA.Presentation.ViewModels
         public bool Loading { get; set; } = true;
 
         /// <summary>
+        /// Contains an error message in case there is an issue loading the Starship data.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SpecieDetailsViewModel"/> class.
         /// </summary>
         /// <param name="swapiService">The service used to fetch species data.</param>
@@ -72,8 +77,8 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
-                // Log any errors during the data fetch process
-                Console.Error.WriteLine($"Failed to fetch starship details: {ex.Message}");
+                ErrorMessage = "Failed to load Starship details or does not exist.";
+                Console.WriteLine($"Error loading Starship details: {ex.Message}");
             }
             finally
             {

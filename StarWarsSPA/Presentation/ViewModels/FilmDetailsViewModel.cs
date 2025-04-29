@@ -83,8 +83,8 @@ namespace StarWarsSPA.Presentation.ViewModels
             catch (Exception ex)
             {
                 // Handle any errors that occur during the data fetch
-                ErrorMessage = "Failed to load film details: " + ex.Message;
-                Console.WriteLine(ErrorMessage);
+                ErrorMessage = "Failed to load film details or does not exist.";
+                Console.WriteLine($"Error loading film details: {ex.Message}");
             }
             finally
             {

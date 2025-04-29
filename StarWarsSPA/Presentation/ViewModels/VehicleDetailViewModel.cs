@@ -28,6 +28,11 @@ namespace StarWarsSPA.Presentation.ViewModels
         public bool Loading { get; private set; } = true;
 
         /// <summary>
+        /// Contains an error message in case there is an issue loading the Vehicle data.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VehicleDetailViewModel"/> class.
         /// </summary>
         /// <param name="swapiService">The service used to fetch vehicle data.</param>
@@ -65,8 +70,8 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
-                // Log any errors during the data fetch process
-                Console.Error.WriteLine($"Failed to fetch vehicle details: {ex.Message}");
+                ErrorMessage = "Failed to load Vehicle details or does not exist.";
+                Console.WriteLine($"Error loading Vehicle details: {ex.Message}");
             }
             finally
             {

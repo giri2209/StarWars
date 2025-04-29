@@ -30,6 +30,11 @@ namespace StarWarsSPA.Presentation.ViewModels
         public bool Loading { get; private set; }
 
         /// <summary>
+        /// Contains an error message in case there is an issue loading the Specie data.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SpecieDetailsViewModel"/> class.
         /// </summary>
         /// <param name="swapiService">The service used to fetch species data.</param>
@@ -67,8 +72,8 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
-                // Log the error (can be replaced with a more advanced logging mechanism)
-                Console.Error.WriteLine($"Failed to fetch species details: {ex.Message}");
+                ErrorMessage = "Failed to load Specie details or does not exist.";
+                Console.WriteLine($"Error loading Specie details: {ex.Message}");
             }
             finally
             {

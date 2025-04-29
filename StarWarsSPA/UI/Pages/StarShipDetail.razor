@@ -3,65 +3,68 @@
 @using StarWarsSPA.Core.Interfaces
 @using StarWarsSPA.Presentation.ViewModels
 @inject StarShipDetailsViewModel ViewModel
-
 <!-- Page title for browser -->
 <PageTitle>Starship Details</PageTitle>
 
-<!-- Loading or starship details display -->
-@if (ViewModel.Loading)
-{
-    <p class="text-center text-gray-400 mt-20">Loading starship...</p>
-}
-else if (ViewModel.Starship != null)
-{
-    <!-- Main page content -->
-    <div class="min-h-screen bg-gradient-to-br from-gray-950 to-black text-white px-6 py-8">
-        <BreadCrumbs />
-        <!-- Starship detail card -->
-        <div class="max-w-4xl mx-auto bg-black bg-opacity-70 border border-yellow-400 rounded-2xl p-6 shadow-xl">
-            <h1 class="text-3xl font-bold text-yellow-400 mb-3">@ViewModel.Starship.Name</h1>
-            <p class="text-sm text-gray-300 mb-4">@ViewModel.Starship.Model by @ViewModel.Starship.Manufacturer</p>
+<div class="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white p-6">
 
-            <!-- Starship specs in grid layout -->
-            <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300 mb-6">
-                <div>
-                    <p><span class="text-yellow-400">Cost:</span> @ViewModel.Starship.CostInCredits credits</p>
-                    <p><span class="text-yellow-400">Crew:</span> @ViewModel.Starship.Crew</p>
-                    <p><span class="text-yellow-400">Passengers:</span> @ViewModel.Starship.Passengers</p>
-                    <p><span class="text-yellow-400">Class:</span> @ViewModel.Starship.StarshipClass</p>
-                </div>
-                <div>
-                    <p><span class="text-yellow-400">Speed:</span> @ViewModel.Starship.MaxAtmospheringSpeed</p>
-                    <p><span class="text-yellow-400">Hyperdrive Rating:</span> @ViewModel.Starship.HyperdriveRating</p>
-                    <p><span class="text-yellow-400">MGLT:</span> @ViewModel.Starship.MGLT</p>
-                </div>
-            </div>
-
-            <!-- Pilots and Films list -->
-            <DetailList Title="Pilots"
-                        Items="ViewModel.Pilots"
-                        UrlBase="/pilots"
-                        GetItemName="pilot => pilot?.Name ?? string.Empty"
-                        GetItemUrl="pilot => pilot?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
-
-            <DetailList Title="Films"
-                        Items="ViewModel.Films"
-                        UrlBase="/films"
-                        GetItemName="film => film?.Title ?? string.Empty"
-                        GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
-
-
-        </div>
-    </div>
-}
-
-@code {
-    [Parameter] public string? Id { get; set; }
-
-    // Initialization: fetch the starship data by Id
-    protected override async Task OnInitializedAsync()
+    <BreadCrumbs />
+    <!-- Loading or starship details display -->
+    @if (ViewModel.Loading)
     {
-        var starShipId = Id ?? "";
-        await ViewModel.InitializeAsync(starShipId);
+        <p class="text-center text-gray-400 mt-20">Loading starship...</p>
     }
-}
+    else if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+    {
+        <p class="text-center mt-10 text-yellow-400 font-semibold">@ViewModel.ErrorMessage</p>
+    }
+    else if (ViewModel.Starship != null)
+    {
+            <!-- Starship detail card -->
+            <div class="max-w-4xl mx-auto bg-black bg-opacity-70 border border-yellow-400 rounded-2xl p-6 shadow-xl">
+                <h1 class="text-3xl font-bold text-yellow-400 mb-3">@ViewModel.Starship.Name</h1>
+                <p class="text-sm text-gray-300 mb-4">@ViewModel.Starship.Model by @ViewModel.Starship.Manufacturer</p>
+
+                <!-- Starship specs in grid layout -->
+                <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-300 mb-6">
+                    <div>
+                        <p><span class="text-yellow-400">Cost:</span> @ViewModel.Starship.CostInCredits credits</p>
+                        <p><span class="text-yellow-400">Crew:</span> @ViewModel.Starship.Crew</p>
+                        <p><span class="text-yellow-400">Passengers:</span> @ViewModel.Starship.Passengers</p>
+                        <p><span class="text-yellow-400">Class:</span> @ViewModel.Starship.StarshipClass</p>
+                    </div>
+                    <div>
+                        <p><span class="text-yellow-400">Speed:</span> @ViewModel.Starship.MaxAtmospheringSpeed</p>
+                        <p><span class="text-yellow-400">Hyperdrive Rating:</span> @ViewModel.Starship.HyperdriveRating</p>
+                        <p><span class="text-yellow-400">MGLT:</span> @ViewModel.Starship.MGLT</p>
+                    </div>
+                </div>
+
+                <!-- Pilots and Films list -->
+                <DetailList Title="Pilots"
+                            Items="ViewModel.Pilots"
+                            UrlBase="/pilots"
+                            GetItemName="pilot => pilot?.Name ?? string.Empty"
+                            GetItemUrl="pilot => pilot?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+                <DetailList Title="Films"
+                            Items="ViewModel.Films"
+                            UrlBase="/films"
+                            GetItemName="film => film?.Title ?? string.Empty"
+                            GetItemUrl="film => film?.Url?.Split('/', StringSplitOptions.RemoveEmptyEntries).Last()" />
+
+
+            </div>
+    }
+        </div>
+
+    @code {
+        [Parameter] public string? Id { get; set; }
+
+        // Initialization: fetch the starship data by Id
+        protected override async Task OnInitializedAsync()
+        {
+            var starShipId = Id ?? "";
+            await ViewModel.InitializeAsync(starShipId);
+        }
+    }

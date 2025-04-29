@@ -40,11 +40,27 @@ namespace StarWarsSPA.Presentation.ViewModels
         public int TotalPages => (int)Math.Ceiling((double)FilteredPlanets.Count / ItemsPerPage);
 
         /// <summary>
+        /// Indicates if the current page is the first page.
+        /// </summary>
+        public bool IsFirstPage => CurrentPage == 1;
+
+        /// <summary>
+        /// Indicates if the current page is the last page.
+        /// </summary>
+        public bool IsLastPage => CurrentPage == TotalPages;
+
+
+        /// <summary>
         /// Gets a paginated list of planets based on the current page.
         /// </summary>
         public IEnumerable<Planet> PaginatedPlanets => FilteredPlanets
             .Skip((CurrentPage - 1) * ItemsPerPage)
             .Take(ItemsPerPage);
+
+        /// <summary>
+        /// Stores any error message encountered during data loading.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlanetViewModel"/> class.
@@ -77,6 +93,7 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
+                ErrorMessage = "Failed to load Planets. Please try again later.";
                 // Log the error (can be replaced with a more advanced logging mechanism)
                 Console.WriteLine($"Error loading planets: {ex.Message}");
             }
@@ -93,13 +110,28 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <param name="query">The search query to filter planets by name.</param>
         public void HandleSearch(string query)
         {
-            // Filter the list based on the search query (case-insensitive)
-            FilteredPlanets = Planets
-                .Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            FilteredPlanets = string.IsNullOrWhiteSpace(query) ? Planets
+            : Planets.Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+             .ToList();
 
-            // Reset the page to the first page after filtering
             CurrentPage = 1;
+
+        }
+
+        public void GoToNextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                CurrentPage++;
+            }
+        }
+
+        public void GoToPreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
         }
     }
 }

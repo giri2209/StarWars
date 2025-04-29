@@ -37,6 +37,17 @@ namespace StarWarsSPA.Presentation.ViewModels
         public int ItemsPerPage { get; set; } = 9;
 
         /// <summary>
+        /// Indicates if the current page is the first page.
+        /// </summary>
+        public bool IsFirstPage => CurrentPage == 1;
+
+        /// <summary>
+        /// Indicates if the current page is the last page.
+        /// </summary>
+        public bool IsLastPage => CurrentPage == TotalPages;
+
+
+        /// <summary>
         /// The paginated starships for the current page.
         /// </summary>
         public IEnumerable<Starship> PaginatedStarships =>
@@ -47,6 +58,11 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// </summary>
         public int TotalPages =>
             (int)Math.Ceiling((double)FilteredStarShips.Count / ItemsPerPage);
+
+        /// <summary>
+        /// Stores any error message encountered during data loading.
+        /// </summary>
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StarShipViewModel"/> class.
@@ -74,6 +90,7 @@ namespace StarWarsSPA.Presentation.ViewModels
             }
             catch (Exception ex)
             {
+                ErrorMessage = "Failed to load Starships. Please try again later.";
                 // Log any errors during the data fetch process
                 Console.Error.WriteLine($"Failed to fetch starships: {ex.Message}");
             }
@@ -89,10 +106,12 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <param name="query">The search query used to filter the starships by name.</param>
         public void HandleSearch(string query)
         {
-            FilteredStarShips = Starships
-                .Where(s => !string.IsNullOrEmpty(s.Name) && s.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-            CurrentPage = 1; // Reset to the first page after a new search
+            FilteredStarShips = string.IsNullOrWhiteSpace(query) ? Starships
+            : Starships.Where(s => !string.IsNullOrEmpty(s.Name) && s.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+               .ToList();
+
+            CurrentPage = 1;
+
         }
 
         /// <summary>
@@ -102,5 +121,21 @@ namespace StarWarsSPA.Presentation.ViewModels
         /// <returns>The ID extracted from the URL.</returns>
         public string GetIdFromUrl(string url) =>
             url.TrimEnd('/').Split('/').Last();
+
+        public void GoToNextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                CurrentPage++;
+            }
+        }
+
+        public void GoToPreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
+        }
     }
 }
