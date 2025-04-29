@@ -53,7 +53,18 @@ namespace StarWarsSPA.Presentation.ViewModels
             Loading = true;
             try
             {
-                Species = await _swapiService.GetAsync<Specie>($"species/{speciesId}");
+                ErrorMessage = null;
+                Species = null;
+
+                var species = await _swapiService.GetAsync<Specie>($"species/{speciesId}");
+
+                if (species == null)
+                {
+                    ErrorMessage = "Species not found.";
+                    return;
+                }
+
+                Species = species;
 
                 // If the specie's films list is not null, fetch the associated films
                 var filmsList = Species?.Films ?? new List<string>(); // Use an empty list if null

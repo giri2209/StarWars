@@ -60,8 +60,18 @@ namespace StarWarsSPA.Presentation.ViewModels
         {
             try
             {
-                // Fetch person data
-                Person = await _swapiService.GetAsync<Person>($"people/{id}");
+                ErrorMessage = null;
+                Person = null;
+
+                var person = await _swapiService.GetAsync<Person>($"people/{id}");
+
+                if (person == null)
+                {
+                    ErrorMessage = "Character details not found.";
+                    return;
+                }
+
+                Person = person;
 
                 if (Person != null)
                 {

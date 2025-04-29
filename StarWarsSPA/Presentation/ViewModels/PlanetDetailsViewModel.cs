@@ -51,8 +51,18 @@ namespace StarWarsSPA.Presentation.ViewModels
             {
                 Loading = true;
 
-                // Fetch the planet details
-                Planet = await _swapiService.GetAsync<Planet>($"planets/{id}");
+                ErrorMessage = null;
+                Planet = null;
+
+                var planet = await _swapiService.GetAsync<Planet>($"planets/{id}");
+
+                if (planet == null)
+                {
+                    ErrorMessage = "Planet not found.";
+                    return;
+                }
+
+                Planet = planet;
 
                 // If the planet's films list is not null, fetch the associated films
                 var filmsList = Planet?.Films ?? new List<string>(); // Use an empty list if null

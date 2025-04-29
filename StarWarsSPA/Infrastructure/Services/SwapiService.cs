@@ -28,8 +28,7 @@ namespace StarWarsSPA.Infrastructure.Services
             {
                 // Logs any error that occurs during the API call
                 Console.Error.WriteLine($"GetAsync<{typeof(T).Name}> error: {ex.Message}");
-                throw;
-                //return default;  // Returns the default value for the type T in case of an error
+                return default;  // Returns the default value for the type T in case of an error
             }
         }
 
@@ -45,8 +44,7 @@ namespace StarWarsSPA.Infrastructure.Services
             {
                 // Logs any error that occurs during the API call
                 Console.Error.WriteLine($"GetListAsync<{typeof(T).Name}> error: {ex.Message}");
-                throw;
-                //return new List<T>();  // Returns an empty list in case of an error
+                return new List<T>();  // Returns an empty list in case of an error
             }
         }
 
@@ -65,8 +63,7 @@ namespace StarWarsSPA.Infrastructure.Services
                 {
                     // Logs any error that occurs while fetching the URL
                     Console.Error.WriteLine($"GetManyAsync<{typeof(T).Name}> error fetching {url}: {ex.Message}");
-                    throw;
-                    //return default;  // Returns default value for the type T in case of an error
+                    return default;  // Returns default value for the type T in case of an error
                 }
             });
 

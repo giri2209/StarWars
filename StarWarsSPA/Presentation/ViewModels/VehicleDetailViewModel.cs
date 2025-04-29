@@ -53,7 +53,18 @@ namespace StarWarsSPA.Presentation.ViewModels
             try
             {
                 // Fetch the vehicle by ID
-                Vehicle = await _swapiService.GetAsync<Vehicle>($"vehicles/{id}");
+                ErrorMessage = null;
+                Vehicle = null;
+
+                var vehicle = await _swapiService.GetAsync<Vehicle>($"vehicles/{id}");
+
+                if (vehicle == null)
+                {
+                    ErrorMessage = "Vehicle not found.";
+                    return;
+                }
+
+                Vehicle = vehicle;
 
                 if (Vehicle != null)
                 {

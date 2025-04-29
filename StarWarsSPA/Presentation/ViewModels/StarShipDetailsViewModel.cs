@@ -58,7 +58,18 @@ namespace StarWarsSPA.Presentation.ViewModels
             try
             {
                 // Fetch the starship details
-                Starship = await swapiService.GetAsync<Starship>($"starships/{id}");
+                ErrorMessage = null;
+                Starship = null;
+
+                var starship = await swapiService.GetAsync<Starship>($"starships/{id}");
+
+                if (starship == null)
+                {
+                    ErrorMessage = "Starship not found.";
+                    return;
+                }
+
+                Starship = starship;
 
                 // If the Starship's pilots list is not null, fetch the associated films
                 var pilotsList = Starship?.Pilots ?? new List<string>(); // Use an empty list if null

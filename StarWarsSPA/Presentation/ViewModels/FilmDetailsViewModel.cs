@@ -70,20 +70,29 @@ namespace StarWarsSPA.Presentation.ViewModels
             {
                 // Start loading process
                 Loading = true;
+                ErrorMessage = null;
+                Film = null;
 
-                // Fetch the film details based on the ID
-                Film = await _swapiService.GetAsync<Film>($"films/{id}");
+                var film = await _swapiService.GetAsync<Film>($"films/{id}");
+
+                if (film == null)
+                {
+                    ErrorMessage = "Film details not found.";
+                    return;
+                }
+
+                Film = film;
 
                 // If the film has characters, starships, planets, or species, fetch them asynchronously
-                Characters = await _swapiService.GetManyAsync<Person>(Film?.Characters ?? new List<string>());
-                Starships = await _swapiService.GetManyAsync<Starship>(Film?.Starships ?? new List<string>());
-                Planets = await _swapiService.GetManyAsync<Planet>(Film?.Planets ?? new List<string>());
-                Species = await _swapiService.GetManyAsync<Specie>(Film?.Species ?? new List<string>());
+                Characters = await _swapiService.GetManyAsync<Person>(Film.Characters ?? new List<string>());
+                Starships = await _swapiService.GetManyAsync<Starship>(Film.Starships ?? new List<string>());
+                Planets = await _swapiService.GetManyAsync<Planet>(Film.Planets ?? new List<string>());
+                Species = await _swapiService.GetManyAsync<Specie>(Film.Species ?? new List<string>());
             }
             catch (Exception ex)
             {
                 // Handle any errors that occur during the data fetch
-                ErrorMessage = "Failed to load film details or does not exist.";
+                ErrorMessage = "Failed to load Film details or does not exist.";
                 Console.WriteLine($"Error loading film details: {ex.Message}");
             }
             finally
